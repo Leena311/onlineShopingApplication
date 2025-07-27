@@ -1,0 +1,16 @@
+services:
+  api-gateway:
+    build: .
+    container_name: api-gateway
+    ports:
+      - "9000:9000"
+#    init: true
+    environment:
+      - EUREKA_URL=http://main-eureka-server:8761/eureka
+
+    networks:
+      - spring-net
+
+networks:
+  spring-net:
+    external: true

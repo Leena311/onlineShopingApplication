@@ -1,0 +1,37 @@
+
+services:
+  order-mysqldb:
+    image: mysql:8.0
+    container_name: order-mysql
+    restart: always
+    ports:
+      - 3311:3306
+    environment:
+     MYSQL_ROOT_PASSWORD: root
+     MYSQL_DATABASE: order_service_db
+    volumes:
+      - ./mysql/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - order_mysql_data:/var/lib/mysql
+
+    networks:
+      - spring-net
+
+
+  server:
+    build: .
+    container_name: order-service
+    ports:
+      - 8084:8084
+    depends_on:
+      - order-mysqldb
+    environment:
+      - EUREKA_URL=http://main-eureka-server:8761/eureka/
+    networks:
+      - spring-net
+
+volumes:
+  order_mysql_data: {}
+
+networks:
+  spring-net:
+    external: true

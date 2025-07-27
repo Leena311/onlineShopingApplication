@@ -1,0 +1,38 @@
+
+services:
+  product-mysqldb:
+    image: mysql:8.0
+    container_name: product-mysql
+    restart: always
+    ports:
+      - 3310:3306
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: product_service_db
+    volumes:
+      - ./mysql/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - product_mysql_data:/var/lib/mysql
+
+
+    networks:
+      - spring-net
+
+
+  server:
+    build: .
+    container_name: product-service
+    ports:
+      - 8083:8083
+    depends_on:
+      - product-mysqldb
+    environment:
+      - EUREKA_URL=http://main-eureka-server:8761/eureka/
+    networks:
+      - spring-net
+
+volumes:
+  product_mysql_data: {}
+
+networks:
+  spring-net:
+    external: true

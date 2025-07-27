@@ -1,0 +1,11 @@
+services:
+  main-eureka-server:
+    build: .
+    container_name: main-eureka-server
+    ports:
+      - "8761:8761"
+    networks:
+      - spring-net
+networks:
+  spring-net:
+    external: true

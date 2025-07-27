@@ -1,0 +1,88 @@
+
+services:
+  inventory-mysqldb:
+    image: mysql:8.0
+    container_name: inventory-mysql
+    restart: always
+    ports:
+      - 3312:3306
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: inventory_service_db
+    volumes:
+      - ./mysql/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - inventory_mysql_data:/var/lib/mysql
+
+    networks:
+      - spring-net
+#Without load balncing without multiple port
+#  server:
+#    build: .
+#    container_name: inventory-service
+##    ports:
+##      - 8086:8086
+#    depends_on:
+#      - inventory-mysqldb
+#    environment:
+#      - EUREKA_URL=http://main-eureka-server:8761/eureka/
+#      - SERVER_PORT=8080
+#    networks:
+#      - spring-net
+#    expose:
+#      - "8080"
+
+  inventory-service-1:
+    #image: inventory-service:latest
+    build:
+      context: .
+    container_name: inventory-service-1
+    environment:
+      - SERVER_PORT=8080
+      - CUSTOM_INSTANCE_ID=inventory-service-1
+      - EUREKA_URL=http://main-eureka-server:8761/eureka/
+    ports:
+      - "8086:8080"
+
+    depends_on:
+      - inventory-mysqldb
+    networks:
+      - spring-net
+
+  inventory-service-2:
+    #image: inventory-service:latest
+    build:
+      context: .
+    container_name: inventory-service-2
+    ports:
+      - "8087:8081"
+    environment:
+      - SERVER_PORT=8081
+      - CUSTOM_INSTANCE_ID=inventory-service-2
+      - EUREKA_URL=http://main-eureka-server:8761/eureka/
+    networks:
+      - spring-net
+
+  inventory-service-3:
+    #manuaaly buid
+    #image: inventory-service:latest
+    #build automatically,
+    build:
+      context: .
+    container_name: inventory-service-3
+    ports:
+      - "8088:8082"
+    environment:
+      - SERVER_PORT=8082
+      - CUSTOM_INSTANCE_ID=inventory-service-3
+      - EUREKA_URL=http://main-eureka-server:8761/eureka/
+    networks:
+      - spring-net
+
+
+
+volumes:
+  inventory_mysql_data: {}
+
+networks:
+  spring-net:
+    external: true
