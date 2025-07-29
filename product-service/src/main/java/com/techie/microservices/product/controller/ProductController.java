@@ -26,6 +26,11 @@ public class ProductController {
     @GetMapping("/productbyId/{id}")
     @ResponseStatus(HttpStatus.OK)
     public ProductResponse getProductById(@PathVariable Integer id){
+//        try {
+//            Thread.sleep(5000);
+//        } catch (InterruptedException e) {
+//            throw new RuntimeException(e);
+//        }
         return productService.findProductById(id);
     }
     @PutMapping("/update/{id}")
